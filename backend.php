@@ -1,6 +1,11 @@
 <?php
 	function res($msg) {
-		die($msg);
+		header("Content-Type", "text/plain");
+		die("error:$msg");
+	}
+	function resok($msg) {
+		header("Content-Type", "text/plain");
+		die("ok:$msg");
 	}
 	if (!session_start()) {
 		res("error");
@@ -18,7 +23,7 @@
 	$action = $_GET["action"];
 	if ($action == "order") {
 		if (array_key_exists("secret", $_SESSION)) {
-			res("no");
+			res("come back later");
 		}
 		$salt = hash("sha256", openssl_random_pseudo_bytes(1024));
 		$secret = rand(1, 1000000);
@@ -27,8 +32,7 @@
 			$uuaa = hash("sha256", $uuaa);
 		}
 		$_SESSION["secret"] = $secret;
-		header("Content-Type", "text/plain");
-		echo $uuaa;
+		resok($uuaa);
 	} else if ($action == "purchase") {
 		if (!array_key_exists("secret", $_SESSION)) {
 			res("no");
@@ -39,7 +43,7 @@
 		$secret = $_SESSION["secret"];
 		if ("$secret" == $_GET["secret"]) {
 			$_SESSION["purchased"] = True;
-			res("purchase ok");
+			resok("purchase ok");
 		} else {
 			$_SESSION["disqualified"] = True;
 			res("plonking");

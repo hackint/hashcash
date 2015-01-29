@@ -11,7 +11,7 @@
   <body>
     <h1>Hackint anonymous user registration</h1>
     <div id="content">
-      G'day! We wish your stay at hackint to be a pleasant
+      G&apos;day! We wish your stay at hackint to be a pleasant
       one. Unfortunately, completely anonymous access can be and is
       being abused regularily. Ironically, in order to preserve
       anonymous access, we have to introduce a <strong>cost</strong>
@@ -25,10 +25,10 @@
     </div>
     <div style="border: thin dotted black" id="cputriezen">
       <h2>Calculating...</h2>
-      <div>Core1: <div id="progress1"></div></div>
-      <div>Core2: <div id="progress2"></div></div>
-      <div>Core3: <div id="progress3"></div></div>
-      <div>Core4: <div id="progress4"></div></div>
+      <div>Core1: <div id="progress0"></div></div>
+      <div>Core2: <div id="progress1"></div></div>
+      <div>Core3: <div id="progress2"></div></div>
+      <div>Core4: <div id="progress3"></div></div>
     </div>
     <div id="registration" style="display: none">
       Thank you very much for your patience. You may now register an
@@ -46,42 +46,57 @@
     <script src="js/bootstrap.min.js"></script>
     <script type="text/javascript">
 
+    var accept = function(data) {
+	var data_s = data.split(":", 2);
+	if (data_s[0] == "error") {
+	    alert("Error: " + data_s[1]);
+	    return;
+	}
+	if (data_s[1] == "purchase ok") {
+	    document.getElementById("txtVeronica").value = e.data["value"].toString();
+	    document.getElementById("registration").style.display = "";
+	    document.getElementById("cputriezen").style.display = "none";	    
+	}
+    }
+
       $(function() {
-          var hasher1 = new Worker("js/hashcash.js");
-          var hasher2 = new Worker("js/hashcash.js");
-          var hasher3 = new Worker("js/hashcash.js");
-          var hasher4 = new Worker("js/hashcash.js");
-	  hasher1.postMessage(["07c3b48a53c31ed9cc2124a33fd954d1e73d4db3",
-			       "9376c9c28b2a5f5de6bfe67b4e4b9e0dbe45cb27b163e9603cfb933d31bbfacc",
-			       0, 250000]);
-	  hasher2.postMessage(["07c3b48a53c31ed9cc2124a33fd954d1e73d4db3",
-			       "9376c9c28b2a5f5de6bfe67b4e4b9e0dbe45cb27b163e9603cfb933d31bbfacc",
-			       250001, 500000]);
-	  hasher3.postMessage(["07c3b48a53c31ed9cc2124a33fd954d1e73d4db3",
-			       "9376c9c28b2a5f5de6bfe67b4e4b9e0dbe45cb27b163e9603cfb933d31bbfacc",
-			       500001, 750000]);
-	  hasher4.postMessage(["07c3b48a53c31ed9cc2124a33fd954d1e73d4db3",
-			       "9376c9c28b2a5f5de6bfe67b4e4b9e0dbe45cb27b163e9603cfb933d31bbfacc",
-			       750001, 1000000]);
-	  var onMessageFunction = function(progressID) {
-	      return function(e) {
-		  if (e.data["event"] == "finished") {
-                      document.getElementById("txtVeronica").value = e.data["value"].toString();
-                      document.getElementById("registration").style.display = "";
-                      document.getElementById("cputriezen").style.display = "none";
-                      hasher1.terminate();
-                      hasher2.terminate();
-                      hasher3.terminate();
-                      hasher4.terminate();
-		  } else if (e.data["event"] == "progress") {
-		      document.getElementById(progressID).innerHTML = e.data["text"];
-		  }
-	      };
-	  };
-          hasher1.onmessage = onMessageFunction("progress1");
-          hasher2.onmessage = onMessageFunction("progress2");
-          hasher3.onmessage = onMessageFunction("progress3");
-          hasher4.onmessage = onMessageFunction("progress4");
+	  jQuery.ajax({url: "/hashcash/backend.php",
+		       type: "GET",
+		       data: {action: "order"}}).done(function(data) {
+			   var data_s = data.split(":", 2);
+			   if (data_s[0] == "error") {
+			       alert("Error: " + data_s[1]);
+			       return;
+			   }
+			   var data_v = data_s[1].split(":");
+			   var salt = data_v[0];
+			   var payload = data_v[1];
+			   var hashers = new Array();
+			   var numCores = 4;
+			   var max = 1000000;
+			   var percore = max / numCores;
+			   var onMessageFunction = function(progressID) {
+			       return function(e) {
+				   if (e.data["event"] == "finished") {
+				       jQuery.ajax({url: "/hashcash/backend.php",
+						    type: "GET",
+						    data: {action: "purchase",
+							   secret: e.data["value"].toString()}}).done(accept);
+				       for (var i = 0; i < hashers.length; i++) {
+					   hasher[i].terminate();
+				       }
+				   } else if (e.data["event"] == "progress") {
+				       document.getElementById(progressID).innerHTML = e.data["text"];
+				   }
+			       };
+			   };
+			   for (var i = 0; i < numCores; i++) {
+			       var hasher = new Worker("js/hashcash.js");
+			       hasher.postMessage([salt, payload, percore * i, percore * (i + 1)]);
+			       hasher.onmessage = onMessageFunction("progress" + i.toString());
+			       hashers.push(hasher);
+			   }
+		       });
       });
     </script>
   </body>
