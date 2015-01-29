@@ -66,7 +66,6 @@
 	  var onMessageFunction = function(progressID) {
 	      return function(e) {
 		  if (e.data["event"] == "finished") {
-                      alert("Hooray! The correct answer is " + e.data["value"]); // do an ajax answer here
                       document.getElementById("txtVeronica").value = e.data["value"].toString();
                       document.getElementById("registration").style.display = "";
                       document.getElementById("cputriezen").style.display = "none";
