@@ -53,7 +53,6 @@
 	    return;
 	}
 	if (data_s[1] == "purchase ok") {
-	    document.getElementById("txtVeronica").value = e.data["value"].toString();
 	    document.getElementById("registration").style.display = "";
 	    document.getElementById("cputriezen").style.display = "none";	    
 	}
@@ -68,7 +67,7 @@
 			       alert("Error: " + data_s[1]);
 			       return;
 			   }
-			   var data_v = data_s[1].split(":");
+			   var data_v = data_s[1].split(";");
 			   var salt = data_v[0];
 			   var payload = data_v[1];
 			   var hashers = new Array();
@@ -78,12 +77,13 @@
 			   var onMessageFunction = function(progressID) {
 			       return function(e) {
 				   if (e.data["event"] == "finished") {
+                                       document.getElementById("txtVeronica").value = e.data["value"].toString();
 				       jQuery.ajax({url: "/hashcash/backend.php",
 						    type: "GET",
 						    data: {action: "purchase",
 							   secret: e.data["value"].toString()}}).done(accept);
 				       for (var i = 0; i < hashers.length; i++) {
-					   hasher[i].terminate();
+					   hashers[i].terminate();
 				       }
 				   } else if (e.data["event"] == "progress") {
 				       document.getElementById(progressID).innerHTML = e.data["text"];

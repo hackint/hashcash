@@ -25,14 +25,14 @@
 		if (array_key_exists("secret", $_SESSION)) {
 			res("come back later");
 		}
-		$salt = hash("sha256", openssl_random_pseudo_bytes(1024));
+		$salt = hash("sha1", openssl_random_pseudo_bytes(1024));
 		$secret = rand(1, 1000000);
 		$uuaa = "$salt$secret";
-		for ($i = 0; $i < 999; $i++) {
+		for ($i = 0; $i < 99; $i++) {
 			$uuaa = hash("sha256", $uuaa);
 		}
 		$_SESSION["secret"] = $secret;
-		resok($uuaa);
+		resok("$salt;$uuaa");
 	} else if ($action == "purchase") {
 		if (!array_key_exists("secret", $_SESSION)) {
 			res("no");
