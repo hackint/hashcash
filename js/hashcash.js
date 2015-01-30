@@ -174,12 +174,12 @@ function guessHash(hashfun, rounds, salt, first, max, payload, onSuccess) {
 	    alert("hashcash failure");
 	    return;
 	}
-	if ((cur - first) % 1000 == 0) {
+	if ((cur - first) % 100 == 0) {
 	    var curdate = new Date();
 	    var timediff = curdate - lastdate;
 	    lastdate = curdate;
 	    var calculationstogo = max - cur;
-	    var timepercalculation = timediff / 1000;
+	    var timepercalculation = timediff / 100;
 	    var timetogo = calculationstogo * timepercalculation
 	    var minutes = Math.round(timetogo / 60000);
 	    var minutestring;
@@ -205,7 +205,7 @@ function guessHash(hashfun, rounds, salt, first, max, payload, onSuccess) {
 
 
 onmessage = function(e) {
-    guessHash(Sha256.hash, 999, e.data[0], e.data[2],
+    guessHash(Sha256.hash, e.data[4], e.data[0], e.data[2],
 	      e.data[3], e.data[1], function(succ) {
 		  postMessage({"event": "finished",
 			       "value": succ});

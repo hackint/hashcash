@@ -1,4 +1,5 @@
 <?php
+	$NUM_ROUNDS = 999;
 	function res($msg) {
 		header("Content-Type", "text/plain");
 		die("error:$msg");
@@ -28,11 +29,11 @@
 		$salt = hash("sha1", openssl_random_pseudo_bytes(1024));
 		$secret = rand(1, 1000000);
 		$uuaa = "$salt$secret";
-		for ($i = 0; $i < 999; $i++) {
+		for ($i = 0; $i < $NUM_ROUNDS; $i++) {
 			$uuaa = hash("sha256", $uuaa);
 		}
 		$_SESSION["secret"] = $secret;
-		resok("$salt;$uuaa");
+		resok("$salt;$uuaa;$NUM_ROUNDS");
 	} else if ($action == "purchase") {
 		if (!array_key_exists("secret", $_SESSION)) {
 			res("no");
