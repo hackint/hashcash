@@ -28,7 +28,7 @@
 		$salt = hash("sha1", openssl_random_pseudo_bytes(1024));
 		$secret = rand(1, 1000000);
 		$uuaa = "$salt$secret";
-		for ($i = 0; $i < 99; $i++) {
+		for ($i = 0; $i < 999; $i++) {
 			$uuaa = hash("sha256", $uuaa);
 		}
 		$_SESSION["secret"] = $secret;

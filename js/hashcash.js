@@ -205,7 +205,7 @@ function guessHash(hashfun, rounds, salt, first, max, payload, onSuccess) {
 
 
 onmessage = function(e) {
-    guessHash(Sha256.hash, 99, e.data[0], e.data[2],
+    guessHash(Sha256.hash, 999, e.data[0], e.data[2],
 	      e.data[3], e.data[1], function(succ) {
 		  postMessage({"event": "finished",
 			       "value": succ});
