@@ -28,6 +28,10 @@
 	$nickname = $_GET["username"];
 	$password = $_GET["password"];
 
+	if (preg_match("/^[a-z]+$/", $nickname) === False) {
+		res("You may only use non-capital letters for your nickname");
+	}
+
 	$res = atheme_register("127.0.0.1", 8080, "/xmlrpc", "127.0.0.1", $nickname, $password, "some@anonymous-user.yeah");
 
 	if (strpos($res, 'Registration successful') !== FALSE) {
