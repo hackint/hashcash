@@ -13,16 +13,9 @@
 
 require_once('./atheme.php');
 
-$params = explode(" ", urldecode($_POST['params']));
-
 // echo print_r(explode(" ", urldecode($_POST['params'])));
-if (isset($_POST['params']))
-{
-	echo atheme("127.0.0.1", 8080, "/xmlrpc", $_SERVER['REMOTE_ADDR'], $_POST['username'], $_POST['password'], $_POST['service'], $_POST['command'], $params);
-}
-else
-{
-	echo atheme("127.0.0.1", 8080, "/xmlrpc", $_SERVER['REMOTE_ADDR'], $_POST['username'], $_POST['password'], $_POST['service'], $_POST['command'], NULL);
-}
+// echo atheme_register("127.0.0.1", 8080, "/xmlrpc", "127.0.0.1", "hashcash", "iscool")
+// echo atheme_verify("127.0.0.1", 8080, "/xmlrpc", "127.0.0.1", "xmlrpcregistration", "blahfubar");
+
 
 ?>

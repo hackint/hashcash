@@ -10,8 +10,7 @@
   </head>
   <body>
     <h1>Hackint anonymous user registration</h1>
-    <h2>Note: not yet functional. Should go live in a few days. Feedback welcome in #hackint !</h2>
-    <h2>Note: You need to have seccion cookies enabled for this to work! If you do not have session cookies enabled, change your settings and reload this page!</h2>
+    <h2>Note: You need to have session cookies enabled for this to work! If you do not have session cookies enabled, change your settings and reload this page!</h2>
     <div id="content">
       G&apos;day! We wish your stay at hackint to be a pleasant
       one. Unfortunately, completely anonymous access can be and is
@@ -80,8 +79,12 @@
 				      if (data_s[0] == "error") {
 					  alert(data_s[1]);
 				      } else if (data_s[0] == "ok") {
-					  alert(data_s[1]);
-					  window.location = data_s[2];
+					  if (data_s[1].indexOf("Registration successful")) {
+					      alert("Success!");
+					      window.location = data_s[2];
+					  } else {
+					      alert(data_s[1]);
+					  }
 				      } else {
 					  alert("Server error");
 				      }

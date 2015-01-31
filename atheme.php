@@ -2,37 +2,14 @@
 
 require_once('./xmlrpc.inc');
 
-function atheme_nologin($hostname, $port, $path, $sourceip, $username, $service, $command, $params)
+function atheme_register($hostname, $port, $path, $sourceip, $username, $password, $email)
 {
 	$client = new xmlrpc_client($path, $hostname, $port);
-	$message = new xmlrpcmsg("atheme.command");
-	$message->addParam(new xmlrpcval(".", "string"));
+	$message = new xmlrpcmsg("atheme.register");
 	$message->addParam(new xmlrpcval($username, "string"));
-	$message->addParam(new xmlrpcval($sourceip, "string"));
-	$message->addParam(new xmlrpcval($service, "string"));
-	$message->addParam(new xmlrpcval($command, "string"));
-	if ($params != NULL)
-	{
-		if (sizeof($params) < 2)
-		{
-			foreach($params as $param)
-			{
-				$message->addParam(new xmlrpcval($param, "string"));
-			}
-		}
-		else
-		{
-			$firstparam = $params[0];
-			$secondparam = "";
-			for ($i = 1; $i < sizeof($params); $i++)
-			{
-				$secondparam .= $params[$i] . " ";
-			}
-			$message->addParam(new xmlrpcval($firstparam, "string"));
-			$message->addParam(new xmlrpcval($secondparam, "string"));
-		}
-		$response = $client->send($message);
-	}
+	$message->addParam(new xmlrpcval($password, "string"));
+	$message->addParam(new xmlrpcval($email, "string"));
+	$response = $client->send($message);
 
 	if (!$response->faultCode())
 	{
@@ -44,6 +21,27 @@ function atheme_nologin($hostname, $port, $path, $sourceip, $username, $service,
 	}
 
 }
+
+function atheme_verify($hostname, $port, $path, $sourceip, $username, $code)
+{
+	$client = new xmlrpc_client($path, $hostname, $port);
+	$message = new xmlrpcmsg("atheme.verify");
+	$message->addParam(new xmlrpcval($username, "string"));
+	$message->addParam(new xmlrpcval($code, "string"));
+	$message->addParam(new xmlrpcval($sourceip, "string"));
+	$response = $client->send($message);
+
+	if (!$response->faultCode())
+	{
+		return $response->serialize();
+	}
+	else
+	{
+		return "Command failed: " . $response->faultString();
+	}
+
+}
+
 
 
 
