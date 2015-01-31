@@ -28,7 +28,8 @@
 	$nickname = $_GET["username"];
 	$password = $_GET["password"];
 
-	if (preg_match("/^[a-z]+$/", $nickname) === False) {
+	if (preg_match("/^[a-z]+$/", $nickname)) {
+	} else {
 		res("You may only use non-capital letters for your nickname");
 	}
 
