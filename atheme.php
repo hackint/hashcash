@@ -73,8 +73,7 @@ function atheme($hostname, $port, $path, $sourceip, $username, $password, $servi
 	$message->addParam(new xmlrpcval($command, "string"));
 	if ($params != NULL)
 	{
-		//if (sizeof($params) < 2)
-		if (True)
+		if (sizeof($params) < 2)
 		{
 			foreach($params as $param)
 			{

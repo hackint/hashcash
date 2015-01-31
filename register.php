@@ -33,9 +33,11 @@
 		res("You may only use non-capital letters for your nickname");
 	}
 
-	$res = atheme_register("127.0.0.1", 8080, "/xmlrpc", "127.0.0.1", $nickname, $password, "some@anonymous-user.yeah");
+	$res = atheme_register("127.0.0.1", 8080, "/xmlrpc", $_SERVER['REMOTE_ADDR'], $nickname, $password, "some@anonymous-user.yeah");
+
 
 	if (strpos($res, 'Registration successful') !== FALSE) {
+		atheme("127.0.0.1", 8080, "/xmlrpc", $_SERVER['REMOTE_ADDR'], $nickname, $password, "HostServ", "TAKE", array('hackint/user/$account'));
 		echo "ok:";
 		echo "Registration successful";
 		echo ":http://www.hackint.org/";
