@@ -1,5 +1,5 @@
 <?php
-	$NUM_ROUNDS = 999;
+	$NUM_ROUNDS = 99;
 	function res($msg) {
 		header("Content-Type", "text/plain");
 		die("error:$msg");

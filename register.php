@@ -1,7 +1,5 @@
 <?php
 	require_once('./atheme.php');
-
-	require_once('./atheme.php');
 	function res($msg) {
 		header("Content-Type", "text/plain");
 		die("error:$msg");
@@ -30,7 +28,7 @@
 	$nickname = $_GET["username"];
 	$password = $_GET["password"];
 
-	$res = atheme_register("127.0.0.1", 8080, "/xmlrpc", "127.0.0.1", $nickname, $password);
+	$res = atheme_register("127.0.0.1", 8080, "/xmlrpc", "127.0.0.1", $nickname, $password, "some@anonymous-user.yeah");
 
 	if (strpos($res, 'Registration successful') !== FALSE) {
 		echo "ok:";

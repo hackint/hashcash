@@ -79,17 +79,17 @@
 				      if (data_s[0] == "error") {
 					  alert(data_s[1]);
 				      } else if (data_s[0] == "ok") {
-					  if (data_s[1].indexOf("Registration successful")) {
-					      alert("Success!");
-					      window.location = data_s[2];
-					  } else {
-					      alert(data_s[1]);
-					  }
+				          alert(data_s[1]);
+				          window.location = "http://www.hackint.org/ihashcashok.html";
 				      } else {
 					  alert("Server error");
 				      }
 				  });
 	  });
+
+          window.setInterval(function() {
+	      jQuery.ajax({url: "/hashcash/keepalive.php", type:"GET"}).done(function(data2) {} );
+	  }, 60000);
 
 	  jQuery.ajax({url: "/hashcash/backend.php",
 		       type: "GET",
