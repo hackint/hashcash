@@ -21,7 +21,7 @@
 		res("you haven't done the hashcash calculation");
 	}
 	if (array_key_exists("registered", $_SESSION) && $_SESSION["registered"]) {
-		res("no");
+		res("already registered");
 	}
 
 
