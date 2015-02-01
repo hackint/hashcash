@@ -33,6 +33,10 @@
 		res("You may only use non-capital letters for your nickname");
 	}
 
+	if (strlen($nickname) > 20) {
+		res("Nick too long");
+	}
+
 	$res = atheme_register("127.0.0.1", 8080, "/xmlrpc", $_SERVER['REMOTE_ADDR'], $nickname, $password, "some@anonymous-user.yeah");
 
 
