@@ -1,137 +1,183 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
+    <title>hackint - communication network for the hacker community</title>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv='Content-Type' content='text/html;charset=UTF-8'/>
-    <title>hackint hashcash test</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-  </head>
-  <body>
-    <h1>Hackint anonymous user registration</h1>
-    <h2>Note: You need to have session cookies enabled for this to work! If you do not have session cookies enabled, change your settings and reload this page!</h2>
-    <div id="content">
-      G&apos;day! We wish your stay at hackint to be a pleasant
-      one. Unfortunately, completely anonymous access can be and is
-      being abused regularily. Ironically, in order to preserve
-      anonymous access, we have to introduce a <strong>cost</strong>
-      that each user wishing to stay anonymous has to pay before they
-      can access hackint. This cost is paid for by means
-      of <strong>computation time</strong>. All you have to do
-      is <strong>keep this website open for a few hours</strong> and
-      once the calculations are finished, you will be able to create a
-      nickserv user on hackint using a web form. You will then use
-      this user to connect to hackint via IRC and SASL.
-    </div>
+    <link rel="stylesheet" href="css/hackint.css">
+</head>
+
+<body>
+<div class="box"><pre>
+                 __               __
+                / /_  ____ ______/ /__
+               / __ \/ __ `/ ___/ //_/
+              / / / / /_/ / /__/ ,&lt;            __
+             /_/ /_/\__,_/\___/_/|_|  (*)___  / /_
+                                     / / __ \/ __/
+                                    / / / / / /_
+             http://www.hackint.eu /_/_/ /_/\__/ 
+             http://www.hackint.org
+             http://www.hackint.net
+    </pre>
+</div>
+
+<h2>Hashcash - Anonymous Registration</h2>
+
+<div class="box">
+    <p><strong>Note: You need to have session cookies enabled for this to work! If you do not have session cookies
+        enabled, change your settings and reload this page!</strong></p>
+
+    <p id="content">
+        G&apos;day! We wish your stay at hackint to be a pleasant
+        one. Unfortunately, completely anonymous access can be and is
+        being abused regularily. Ironically, in order to preserve
+        anonymous access, we have to introduce a <strong>cost</strong>
+        that each user wishing to stay anonymous has to pay before they
+        can access hackint. This cost is paid for by means
+        of <strong>computation time</strong>. All you have to do
+        is <strong>keep this website open for a few hours</strong> and
+        once the calculations are finished, you will be able to create a
+        nickserv user on hackint using a web form. You can then use
+        this account to connect to hackint through SASL authentication.
+    </p>
+
     <div style="border: thin dotted black" id="cputriezen">
-      <h2>Calculating...</h2>
-      <div>Core1: <div id="progress0"></div></div>
-      <div>Core2: <div id="progress1"></div></div>
-      <div>Core3: <div id="progress2"></div></div>
-      <div>Core4: <div id="progress3"></div></div>
+        <h3 id="status">Calculating proof-of-work...</h3>
+
+        <div><span class="thread">Thread #1:</span>
+
+            <div id="progress0"></div>
+        </div>
+        <div><span class="thread">Thread #2:</span>
+
+            <div id="progress1"></div>
+        </div>
+        <div><span class="thread">Thread #3:</span>
+
+            <div id="progress2"></div>
+        </div>
+        <div><span class="thread">Thread #4:</span>
+
+            <div id="progress3"></div>
+        </div>
     </div>
     <div id="registration">
-      <div id="txtThankYou" style="display: none">
-	Thank you very much for your patience. You may now register an
-	account on hackint. Please pick a user name and a password.
-      </div>
-      <div id="daForm">
-	<form id="frmRegister">
-          <div>Nickname:</div>
-	  <div><input type="text" name="nickname" value="" id="txtNickname" readonly="readonly" /></div>
-	  <div>Password:</div>
-	  <div><input type="password" name="nickpass" value="" id="txtNickpass" readonly="readonly" /></div>
-	  <div>Anti abuse code:</div>
-	  <div><input type="text" name="veronica" value="Patience, young padawan" id="txtVeronica" readonly="readonly" /></div>
-          <div>Register your account:</div>
-          <div><input type="button" id="btnSubmit" value="Register" disabled="disabled" />
-	</form>
-      </div>
+        <div id="txtThankYou" style="display: none">
+            Thank you very much for your patience. You may now register an
+            account on hackint. Please pick a user name and a password.
+        </div>
+        <div id="daForm" style="display:none;">
+            <form id="frmRegister">
+                <div>Nickname:</div>
+                <div><input type="text" name="nickname" value="" id="txtNickname" readonly="readonly"/></div>
+                <div>Password:</div>
+                <div><input type="password" name="nickpass" value="" id="txtNickpass" readonly="readonly"/></div>
+                <div>Anti abuse code:</div>
+                <div><input type="text" name="veronica" value="Patience, young padawan" id="txtVeronica"
+                            readonly="readonly"/></div>
+                <div>Register your account:</div>
+                <div><input type="button" id="btnSubmit" value="Register" disabled="disabled"/></div>
+            </form>
+        </div>
     </div>
-    <script src="js/jquery-2.1.3.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script type="text/javascript">
+</div>
+<script src="js/jquery-2.1.3.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script type="text/javascript">
 
-      $(function() {
-	  var accept = function(data) {
-	      var data_s = data.split(":", 2);
-	      if (data_s[0] == "error") {
-		  alert("Error: " + data_s[1]);
-		  return;
-	      }
-	      if (data_s[1] == "purchase ok") {
-		  document.getElementById("txtThankYou").style.display = "";
-		  document.getElementById("txtNickname").readOnly = false;
-		  document.getElementById("txtNickpass").readOnly = false;
-		  document.getElementById("btnSubmit").disabled = false;
-		  document.getElementById("cputriezen").style.display = "none";	    
-	      }
-	  }
+    $(function () {
+        var accept = function (data) {
+            var data_s = data.split(":", 2);
+            if (data_s[0] == "error") {
+                alert("Error: " + data_s[1]);
+                return;
+            }
+            if (data_s[1] == "purchase ok") {
+                document.getElementById("txtThankYou").style.display = "";
+                document.getElementById("txtNickname").readOnly = false;
+                document.getElementById("txtNickpass").readOnly = false;
+                document.getElementById("btnSubmit").disabled = false;
+                document.getElementById("cputriezen").style.display = "none";
+            }
+        }
 
-	  $("#btnSubmit").bind("click", function() {
-	      var user = $("#txtNickname").val();
-	      var pass = $("#txtNickpass").val();
-	      jQuery.ajax({url: "/hashcash/register.php",
-			   data: {username: user,
-				  password: pass}}).done(function(data) {
-				      var data_s = data.split(":");
-				      if (data_s[0] == "error") {
-					  alert(data_s[1]);
-				      } else if (data_s[0] == "ok") {
-				          alert(data_s[1]);
-				          window.location = "http://www.hackint.org/ihashcashok.html";
-				      } else {
-					  alert("Server error");
-				      }
-				  });
-	  });
+        $("#btnSubmit").bind("click", function () {
+            var user = $("#txtNickname").val();
+            var pass = $("#txtNickpass").val();
+            jQuery.ajax({
+                url: "/hashcash/register.php",
+                data: {
+                    username: user,
+                    password: pass
+                }
+            }).done(function (data) {
+                var data_s = data.split(":");
+                if (data_s[0] == "error") {
+                    alert(data_s[1]);
+                } else if (data_s[0] == "ok") {
+                    alert(data_s[1]);
+                    window.location = "http://www.hackint.org/ihashcashok.html";
+                } else {
+                    alert("Server error");
+                }
+            });
+        });
 
-          window.setInterval(function() {
-	      jQuery.ajax({url: "/hashcash/keepalive.php", type:"GET"}).done(function(data2) {} );
-	  }, 60000);
+        window.setInterval(function () {
+            jQuery.ajax({url: "/hashcash/keepalive.php", type: "GET"}).done(function (data2) {
+            });
+        }, 60000);
 
-	  jQuery.ajax({url: "/hashcash/backend.php",
-		       type: "GET",
-		       data: {action: "order"}}).done(function(data) {
-			   var data_s = data.split(":", 2);
-			   if (data_s[0] == "error") {
-			       alert("Error: " + data_s[1]);
-			       return;
-			   }
-			   var data_v = data_s[1].split(";");
-			   var salt = data_v[0];
-			   var payload = data_v[1];
-			   var numRounds = parseInt(data_v[2]);
-			   var hashers = new Array();
-			   var numCores = 4;
-			   var max = 1000000;
-			   var percore = max / numCores;
-			   var onMessageFunction = function(progressID) {
-			       return function(e) {
-				   if (e.data["event"] == "finished") {
-                                       document.getElementById("txtVeronica").value = e.data["value"].toString();
-				       jQuery.ajax({url: "/hashcash/backend.php",
-						    type: "GET",
-						    data: {action: "purchase",
-							   secret: e.data["value"].toString()}}).done(accept);
-				       for (var i = 0; i < hashers.length; i++) {
-					   hashers[i].terminate();
-				       }
-				   } else if (e.data["event"] == "progress") {
-				       document.getElementById(progressID).innerHTML = e.data["text"];
-				   }
-			       };
-			   };
-			   for (var i = 0; i < numCores; i++) {
-			       var hasher = new Worker("js/hashcash.js");
-			       hasher.postMessage([salt, payload, percore * i, percore * (i + 1), numRounds]);
-			       hasher.onmessage = onMessageFunction("progress" + i.toString());
-			       hashers.push(hasher);
-			   }
-		       });
-      });
-    </script>
-  </body>
+        jQuery.ajax({
+            url: "/hashcash/backend.php",
+            type: "GET",
+            data: {action: "order"}
+        }).done(function (data) {
+            var data_s = data.split(":", 2);
+            if (data_s[0] == "error") {
+                alert("Error: " + data_s[1]);
+                return;
+            }
+            var data_v = data_s[1].split(";");
+            var salt = data_v[0];
+            var payload = data_v[1];
+            var numRounds = parseInt(data_v[2]);
+            var hashers = new Array();
+            var numCores = 4;
+            var max = 1000000;
+            var percore = max / numCores;
+            var onMessageFunction = function (progressID) {
+                return function (e) {
+                    if (e.data["event"] == "finished") {
+                        $('#txtVeronica').val(e.data["value"].toString());
+                        $('#status').text("Registration");
+                        $('#daForm').show();
+                        $('#cputriezen').hide();
+                        jQuery.ajax({
+                            url: "/hashcash/backend.php",
+                            type: "GET",
+                            data: {
+                                action: "purchase",
+                                secret: e.data["value"].toString()
+                            }
+                        }).done(accept);
+                        for (var i = 0; i < hashers.length; i++) {
+                            hashers[i].terminate();
+                        }
+                    } else if (e.data["event"] == "progress") {
+                        document.getElementById(progressID).innerHTML = e.data["text"];
+                    }
+                };
+            };
+            for (var i = 0; i < numCores; i++) {
+                var hasher = new Worker("js/hashcash.js");
+                hasher.postMessage([salt, payload, percore * i, percore * (i + 1), numRounds]);
+                hasher.onmessage = onMessageFunction("progress" + i.toString());
+                hashers.push(hasher);
+            }
+        });
+    });
+</script>
+</body>
 </html>
 
