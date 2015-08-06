@@ -123,6 +123,7 @@
         $("#btnRegister").bind("click", function () {
             $.ajax({
                 url: "/hashcash/register.php",
+                type: "POST",
                 data: {
                     username: $("#txtAccountName").val(),
                     password: $("#txtPassword").val()

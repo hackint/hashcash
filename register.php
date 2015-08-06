@@ -2,42 +2,50 @@
 require_once "common.php";
 require_once "atheme.php";
 
-if (!array_key_exists("username", $_GET)) {
-    error("Enter an accoutname.");
+if ($_SERVER['REQUEST_METHOD'] != "POST") {
+    error("Illegal Request Method");
 }
-if (!array_key_exists("password", $_GET)) {
-    error("Enter a password.");
-}
+
 if (!session_start()) {
     error("Internal Error");
 }
-if (!(array_key_exists("purchased", $_SESSION) && $_SESSION["purchased"])) {
+
+// Form Validation
+if (empty($_POST['username'])) {
+    error("Enter an accoutname.");
+} else {
+    if (!preg_match("/^[a-z]+$/", $_POST['username'])) {
+        error("Your accountname has to be lowercase.");
+    } elseif (strlen($_POST['username']) > $ACCOUTNAME_MAX_LEN) {
+        error("Accoutname too long.");
+    }
+}
+
+if (empty($_POST['password'])) {
+    error("Enter a password.");
+}
+
+$nickname = $_POST["username"];
+$password = $_POST["password"];
+
+// Security
+if (!empty($_SESSION['purchased']) && (bool) $_SESSION["purchased"]) {
     error("Missing the proof-of-work.");
 }
-if (array_key_exists("registered", $_SESSION) && $_SESSION["registered"]) {
+if (!empty($_SESSION['registered']) && (bool) $_SESSION["registered"]) {
     error("Already registered.");
 }
 
-$nickname = $_GET["username"];
-$password = $_GET["password"];
-
-if (preg_match("/^[a-z]+$/", $nickname)) {
-} else {
-    error("You may only use non-capital letters for your nickname");
-}
-
-if (strlen($nickname) > 20) {
-    error("Name too long");
-}
-
-$resp = atheme_register("127.0.0.1", 8080, "/xmlrpc", $_SERVER['REMOTE_ADDR'], $nickname, $password, "some@anonymous-user.yeah");
+// Register Account
+$resp = atheme_register($RPC_HOST, $RPC_PORT, "/xmlrpc", $_SERVER['REMOTE_ADDR'], $nickname, $password, $HASHCASH_DEFAULT_EMAIL);
 
 if (strpos($resp, 'Registration successful') !== FALSE) {
-    # assume vhost
+    $_SESSION["registered"] = True;
+
+    // Assume VHost
     atheme("127.0.0.1", 8080, "/xmlrpc", $_SERVER['REMOTE_ADDR'], $nickname, $password, "HostServ", "TAKE", array('hackint/user/$account'));
 
     ok("Registration successful:http://www.hackint.org/");
-    $_SESSION["registered"] = True;
 } else {
     error($resp);
 }
