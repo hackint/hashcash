@@ -1,4 +1,4 @@
 <?php
-	session_start();
-	echo "ok";
-?>
+session_start();
+
+echo "ok";
