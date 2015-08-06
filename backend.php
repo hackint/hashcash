@@ -3,25 +3,26 @@ require_once "common.php";
 
 
 if (!session_start()) {
-    error("Internal Error");
+    error($ERROR_SESSION_INIT);
 }
 
 // Security
 if (empty($_GET['action'])) {
-    error("Illegal Argumnent");
+    error($ERROR_MISSING_ARGS);
 }
-if (!empty($_SESSION['disqualified']) && (bool) $_SESSION['disqualified']) {
-    error("Proof was incorrect, <a href=\"reset.php\">try again</a>.");
+if (!empty($_SESSION['disqualified'])) {
+    error($ERROR_PROOF_INCORRECT);
 }
-if (!empty($_SESSION['purchased']) && (bool) $_SESSION['purchased']) {
-    error("Proof was already used to create an account.");
+if (!empty($_SESSION['purchased'])) {
+    error($ERROR_PROOF_ALREADY_CONFIRMED);
 }
 
 // Action Router
 switch($_GET["action"]) {
     case "order":
+        // Secret Initialization
         if (!empty($_SESSION['secret'])) {
-            error("There is an active session. <a href=\"reset.php\">Clear it</a>?");
+            error($ERROR_ACTIVE_SESSION);
         }
 
         $salt = hash("sha1", openssl_random_pseudo_bytes(1024));
@@ -35,11 +36,12 @@ switch($_GET["action"]) {
         break;
 
     case "purchase":
+        // Proof Delivery and Validation
         if (empty($_SESSION['secret'])) {
-            error("Session was not properly initalized with a secret, <a href=\"reset.php\">try again</a>.");
+            error($ERROR_MISSING_SECRET);
         }
         if (empty($_GET['secret'])) {
-            error("Missing Arguments");
+            error($ERROR_MISSING_ARGS);
         }
 
         if ($_SESSION["secret"] == $_GET['secret']) {
@@ -47,7 +49,7 @@ switch($_GET["action"]) {
             ok("purchase ok");
         } else {
             $_SESSION["disqualified"] = true;
-            error("Proof was incorrect, <a href=\"reset.php\">try again</a>.");
+            error($ERROR_PROOF_INCORRECT);
         }
         break;
 }

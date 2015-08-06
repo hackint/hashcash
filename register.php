@@ -3,37 +3,39 @@ require_once "common.php";
 require_once "atheme.php";
 
 if ($_SERVER['REQUEST_METHOD'] != "POST") {
-    error("Illegal Request Method");
+    error($ERROR_ILLEGAL_METHOD);
 }
 
 if (!session_start()) {
-    error("Internal Error");
+    error($ERROR_SESSION_INIT);
 }
 
 // Form Validation
 if (empty($_POST['username'])) {
-    error("Enter an accoutname.");
+    error();
 } else {
     if (!preg_match("/^[a-z]+$/", $_POST['username'])) {
-        error("Your accountname has to be lowercase.");
+        error($ERROR_ACCOUNTNAME_CASE);
     } elseif (strlen($_POST['username']) > $ACCOUTNAME_MAX_LEN) {
-        error("Accoutname too long.");
+        error($ERROR_ACCOUNTNAME_MAXLEN);
     }
 }
 
 if (empty($_POST['password'])) {
-    error("Enter a password.");
+    error($ERROR_PASSWORD_MISSING);
 }
 
 $nickname = $_POST["username"];
 $password = $_POST["password"];
 
 // Security
-if (!empty($_SESSION['purchased']) && (bool) $_SESSION["purchased"]) {
-    error("Missing the proof-of-work.");
+if (empty($_SESSION['purchased'])) {
+    // proof not yet delivered
+    error($ERROR_MISSING_PROOF);
 }
-if (!empty($_SESSION['registered']) && (bool) $_SESSION["registered"]) {
-    error("Already registered.");
+if (!empty($_SESSION['registered'])) {
+    // already registered
+    error($ERROR_PROOF_ALREADY_USED);
 }
 
 // Register Account
@@ -44,6 +46,9 @@ if (strpos($resp, 'Registration successful') !== FALSE) {
 
     // Assume VHost
     atheme("127.0.0.1", 8080, "/xmlrpc", $_SERVER['REMOTE_ADDR'], $nickname, $password, "HostServ", "TAKE", array('hackint/user/$account'));
+
+    // Destroy session to prevent proof reusal
+    session_destroy();
 
     ok("Registration successful:http://www.hackint.org/");
 } else {
