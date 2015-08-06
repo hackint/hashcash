@@ -12,7 +12,7 @@ if (!session_start()) {
 
 // Form Validation
 if (empty($_POST['username'])) {
-    error();
+    error($ERROR_ACCOUNTNAME_MISSING);
 } else {
     if (!preg_match("/^[a-z]+$/", $_POST['username'])) {
         error($ERROR_ACCOUNTNAME_CASE);
