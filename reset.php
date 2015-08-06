@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// generate a fresh session
-session_regenerate_id(true);
+// force a fresh session
+session_destroy();
 
 header("location: /hashcash/");
