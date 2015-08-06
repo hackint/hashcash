@@ -3,11 +3,13 @@
 <head>
     <title>hackint - communication network for the hacker community</title>
     <meta charset="utf-8">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/hackint.css">
 </head>
 
 <body>
-<div class="box"><pre>
+<div class="box">
+    <pre>
                  __               __
                 / /_  ____ ______/ /__
                / __ \/ __ `/ ___/ //_/
@@ -41,140 +43,177 @@
         this account to connect to hackint through SASL authentication.
     </p>
 
-    <div style="border: thin dotted black" id="cputriezen">
-        <h3 id="status">Calculating proof-of-work...</h3>
+    <div id="error" style="display:none;">
+        <h3 style="color:darkred !important;">Error</h3>
+        <p id="errmsg"></p>
+    </div>
 
-        <div><span class="thread">Thread #1:</span>
+    <div id="monitor" style="display:none;">
+        <h3>Generating proof-of-work...</h3>
 
-            <div id="progress0"></div>
-        </div>
-        <div><span class="thread">Thread #2:</span>
-
-            <div id="progress1"></div>
-        </div>
-        <div><span class="thread">Thread #3:</span>
-
-            <div id="progress2"></div>
-        </div>
-        <div><span class="thread">Thread #4:</span>
-
-            <div id="progress3"></div>
+        <div id="workers">
+            <div>
+                <span class="worker">Worker #1:</span>
+                <div id="progress0"></div>
+            </div>
+            <div>
+                <span class="worker">Worker #2:</span>
+                <div id="progress1"></div>
+            </div>
+            <div>
+                <span class="worker">Worker #3:</span>
+                <div id="progress2"></div>
+            </div>
+            <div>
+                <span class="worker">Worker #4:</span>
+                <div id="progress3"></div>
+            </div>
         </div>
     </div>
-    <div id="registration">
-        <div id="txtThankYou" style="display: none">
+
+    <div id="registration" style="display:none;">
+        <h3>Registration</h3>
+
+        <p>
             Thank you very much for your patience. You may now register an
-            account on hackint. Please pick a user name and a password.
-        </div>
-        <div id="daForm" style="display:none;">
+            account on hackint. Please pick an accountname and a password.
+        </p>
+        <div style="max-width: 200px;">
             <form id="frmRegister">
-                <div>Nickname:</div>
-                <div><input type="text" name="nickname" value="" id="txtNickname" readonly="readonly"/></div>
-                <div>Password:</div>
-                <div><input type="password" name="nickpass" value="" id="txtNickpass" readonly="readonly"/></div>
-                <div>Anti abuse code:</div>
-                <div><input type="text" name="veronica" value="Patience, young padawan" id="txtVeronica"
-                            readonly="readonly"/></div>
-                <div>Register your account:</div>
-                <div><input type="button" id="btnSubmit" value="Register" disabled="disabled"/></div>
+                <input type="hidden" name="proof" value="Patience, young padawan" id="proof" />
+                <div class="form-group">
+                    <label for="txtAccountName">Accountname:</label>
+                    <input type="text" class="form-control disabled" name="accountname" value="" id="txtAccountName" disabled/>
+                </div>
+                <div class="form-group">
+                    <label for="txtPassword">Password:</label>
+                    <input type="password" class="form-control disabled" name="password" value="" id="txtPassword" disabled/>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-success" id="btnRegister"  disabled>Register</button>
+                </div>
             </form>
         </div>
     </div>
 </div>
 <script src="js/jquery-2.1.3.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
 <script type="text/javascript">
-
     $(function () {
-        var accept = function (data) {
-            var data_s = data.split(":", 2);
-            if (data_s[0] == "error") {
-                alert("Error: " + data_s[1]);
+        var error = function(errmsg) {
+            $('#errmsg').html(errmsg);
+            $('#error').show();
+        };
+
+        var accept = function (resp) {
+            var chunks = resp.split(":", 2);
+
+            if (chunks[0] == "error") {
+                error(chunks[1]);
                 return;
             }
-            if (data_s[1] == "purchase ok") {
-                document.getElementById("txtThankYou").style.display = "";
-                document.getElementById("txtNickname").readOnly = false;
-                document.getElementById("txtNickpass").readOnly = false;
-                document.getElementById("btnSubmit").disabled = false;
-                document.getElementById("cputriezen").style.display = "none";
+            if (chunks[1] == "purchase ok") {
+                $('#txtAccountName').prop('disabled', false);
+                $('#txtPassword').prop('disabled', false);
+                $('#btnRegister').prop('disabled', false);
+                $("#registration").show();
             }
-        }
+        };
 
-        $("#btnSubmit").bind("click", function () {
-            var user = $("#txtNickname").val();
-            var pass = $("#txtNickpass").val();
-            jQuery.ajax({
+        // hashcash register form - submit action
+        $("#btnRegister").bind("click", function () {
+            $.ajax({
                 url: "/hashcash/register.php",
                 data: {
-                    username: user,
-                    password: pass
+                    username: $("#txtAccountName").val(),
+                    password: $("#txtPassword").val()
                 }
-            }).done(function (data) {
-                var data_s = data.split(":");
-                if (data_s[0] == "error") {
-                    alert(data_s[1]);
-                } else if (data_s[0] == "ok") {
-                    alert(data_s[1]);
+            }).done(function (resp) {
+                var chunks = resp.split(":");
+
+                if (chunks[0] == "error") {
+                    error(chunks[1]);
+                } else if (chunks[0] == "ok") {
+                    // alert(chunks[1]);
                     window.location = "http://www.hackint.org/ihashcashok.html";
                 } else {
-                    alert("Server error");
+                    error("Unexpected server response");
                 }
             });
         });
 
         window.setInterval(function () {
-            jQuery.ajax({url: "/hashcash/keepalive.php", type: "GET"}).done(function (data2) {
-            });
+            // keep session alive
+            jQuery.ajax({url: "/hashcash/keepalive.php", type: "GET"});
         }, 60000);
 
-        jQuery.ajax({
+        $.ajax({
             url: "/hashcash/backend.php",
             type: "GET",
             data: {action: "order"}
-        }).done(function (data) {
-            var data_s = data.split(":", 2);
-            if (data_s[0] == "error") {
-                alert("Error: " + data_s[1]);
+        }).done(function (resp) {
+            console.log(resp);
+            var chunks = resp.split(":", 2);
+
+            if (chunks[0] == "error") {
+                error(chunks[1]);
                 return;
             }
-            var data_v = data_s[1].split(";");
-            var salt = data_v[0];
-            var payload = data_v[1];
-            var numRounds = parseInt(data_v[2]);
-            var hashers = new Array();
-            var numCores = 4;
-            var max = 1000000;
-            var percore = max / numCores;
-            var onMessageFunction = function (progressID) {
-                return function (e) {
-                    if (e.data["event"] == "finished") {
-                        $('#txtVeronica').val(e.data["value"].toString());
-                        $('#status').text("Registration");
-                        $('#daForm').show();
-                        $('#cputriezen').hide();
+
+            var parts = chunks[1].split(";");
+            var salt = parts[0];
+            var payload = parts[1];
+            var numRounds = parseInt(parts[2]);
+            
+            var workers = [];
+            var workerCount = 4;
+            var workSize = 1000000;
+            var perWorker = workSize / workerCount;
+
+            var onMessageFunction = function (pid) {
+                return function (resp) {
+                    console.log("[#" + pid + "] " + resp.data['event'] + ": " + resp.data['text']);
+                    if (resp.data["event"] == "finished") {
+                        var proof = resp.data["value"].toString();
+                        // insert proof
+                        $('#proof').val(proof);
+                        // hide worker monitor
+                        $('#monitor').hide();
+                        // enable form
+                        $('#txtAccountName').prop('disabled', false);
+                        $('#txtPassword').prop('disabled', false);
+                        $('#btnRegister').prop('disabled', false);
+                        $('#registration').show();
                         jQuery.ajax({
                             url: "/hashcash/backend.php",
                             type: "GET",
                             data: {
                                 action: "purchase",
-                                secret: e.data["value"].toString()
+                                secret: proof
                             }
                         }).done(accept);
-                        for (var i = 0; i < hashers.length; i++) {
-                            hashers[i].terminate();
+
+                        // Terminate Workers
+                        for (var i = 0; i < workers.length; i++) {
+                            console.log("Terminating Worker #" + i);
+                            workers[i].terminate();
                         }
-                    } else if (e.data["event"] == "progress") {
-                        document.getElementById(progressID).innerHTML = e.data["text"];
+                    } else if (resp.data["event"] == "progress") {
+                        // Update Worker Progress
+                        $('#' + pid).html(resp.data["text"]);
                     }
                 };
             };
-            for (var i = 0; i < numCores; i++) {
-                var hasher = new Worker("js/hashcash.js");
-                hasher.postMessage([salt, payload, percore * i, percore * (i + 1), numRounds]);
-                hasher.onmessage = onMessageFunction("progress" + i.toString());
-                hashers.push(hasher);
+
+            // Create Workers
+            for (var i = 0; i < workerCount; i++) {
+                console.log("Starting Worker #" + i);
+                var worker = new Worker("js/hashcash.js");
+                worker.postMessage([salt, payload, perWorker * i, perWorker * (i + 1), numRounds]);
+                worker.onmessage = onMessageFunction("progress" + i.toString());
+                workers.push(worker);
             }
+
+            $('#monitor').show();
         });
     });
 </script>

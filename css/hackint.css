@@ -61,11 +61,11 @@ table.server td, th {
   padding-bottom: 10px;
 }
 
-.thread {
+.worker {
   line-height: 2em;
 }
 
-span.thread {
+span.worker {
   color: #090;
   font-weight: bold;
 }
