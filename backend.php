@@ -1,50 +1,53 @@
 <?php
 require_once "common.php";
 
-$rounds = 99;
 
 if (!session_start()) {
-    error("cannot start session");
-}
-if (!array_key_exists("action", $_GET)) {
-    error("what are you trying to achieve?");
-}
-if (array_key_exists("disqualified", $_SESSION) && $_SESSION["disqualified"]) {
-    error("please delete your session cookie");
-}
-if (array_key_exists("purchased", $_SESSION) && $_SESSION["purchased"]) {
-    error("please delete your session cookie and restart");
+    error("Internal Error");
 }
 
+// Security
+if (empty($_GET['action'])) {
+    error("Illegal Argumnent");
+}
+if (!empty($_SESSION['disqualified']) && (bool) $_SESSION['disqualified']) {
+    error("Proof was incorrect, <a href=\"reset.php\">try again</a>.");
+}
+if (!empty($_SESSION['purchased']) && (bool) $_SESSION['purchased']) {
+    error("Proof was already used to create an account.");
+}
+
+// Action Router
 switch($_GET["action"]) {
     case "order":
-        if (array_key_exists("secret", $_SESSION)) {
-            error("please delete your session cookie and restart");
+        if (!empty($_SESSION['secret'])) {
+            error("There is an active session. <a href=\"reset.php\">Clear it</a>?");
         }
+
         $salt = hash("sha1", openssl_random_pseudo_bytes(1024));
         $secret = rand(1, 100000); // workSize
         $uuaa = "$salt$secret";
-        for ($i = 0; $i < $rounds; $i++) {
+        for ($i = 0; $i < $HASHCASH_ROUNDS; $i++) {
             $uuaa = hash("sha256", $uuaa);
         }
         $_SESSION["secret"] = $secret;
-        ok("$salt;$uuaa;$rounds");
+        ok("$salt;$uuaa;$HASHCASH_ROUNDS");
         break;
 
     case "purchase":
-        if (!array_key_exists("secret", $_SESSION)) {
-            error("some error 1230 has happened");
+        if (empty($_SESSION['secret'])) {
+            error("Session was not properly initalized with a secret, <a href=\"reset.php\">try again</a>.");
         }
-        if (!array_key_exists("secret", $_GET)) {
-            error("what are you doing");
+        if (empty($_GET['secret'])) {
+            error("Missing Arguments");
         }
-        $secret = $_SESSION["secret"];
-        if ("$secret" == $_GET["secret"]) {
-            $_SESSION["purchased"] = True;
+
+        if ($_SESSION["secret"] == $_GET['secret']) {
+            $_SESSION["purchased"] = true;
             ok("purchase ok");
         } else {
-            $_SESSION["disqualified"] = True;
-            error("strange things are going on, please start from scratch, thanks");
+            $_SESSION["disqualified"] = true;
+            error("Proof was incorrect, <a href=\"reset.php\">try again</a>.");
         }
         break;
 }
