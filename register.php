@@ -30,14 +30,14 @@ if (strlen($nickname) > 20) {
     error("Name too long");
 }
 
-$error = atheme_register("127.0.0.1", 8080, "/xmlrpc", $_SERVER['REMOTE_ADDR'], $nickname, $password, "some@anonymous-user.yeah");
+$resp = atheme_register("127.0.0.1", 8080, "/xmlrpc", $_SERVER['REMOTE_ADDR'], $nickname, $password, "some@anonymous-user.yeah");
 
-if (strpos($error, 'Registration successful') !== FALSE) {
+if (strpos($resp, 'Registration successful') !== FALSE) {
     # assume vhost
     atheme("127.0.0.1", 8080, "/xmlrpc", $_SERVER['REMOTE_ADDR'], $nickname, $password, "HostServ", "TAKE", array('hackint/user/$account'));
 
     ok("Registration successful:http://www.hackint.org/");
     $_SESSION["registered"] = True;
 } else {
-    error($error);
+    error($resp);
 }
