@@ -18,7 +18,7 @@ if (!empty($_SESSION['purchased'])) {
 }
 
 // Action Router
-switch($_GET["action"]) {
+switch ($_GET["action"]) {
     case "order":
         // Secret Initialization
         if (!empty($_SESSION['secret'])) {

@@ -3,6 +3,8 @@
 $RPC_HOST = "127.0.0.1";
 $RPC_PORT = 8080;
 
+$HASHCASH_BASE_URL = '/hashcash';
+
 $HASHCASH_DEFAULT_EMAIL = "some@anonymous-user.yeah";
 $HASHCASH_ROUNDS = 99;
 

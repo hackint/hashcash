@@ -4,4 +4,4 @@ session_start();
 // force a fresh session
 session_destroy();
 
-header("location: /hashcash/");
+header("location: $HASHCASH_BASE_URL/");

@@ -1,5 +1,5 @@
 <?php
-require_once "xmlrpc.inc";
+require_once "lib/xmlrpc.inc";
 
 function atheme_register($hostname, $port, $path, $sourceip, $username, $password, $email)
 {
@@ -34,7 +34,6 @@ function atheme_verify($hostname, $port, $path, $sourceip, $username, $code)
     }
 
 }
-
 
 function atheme($hostname, $port, $path, $sourceip, $username, $password, $service, $command, $params)
 {

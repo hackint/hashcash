@@ -34,8 +34,9 @@ if (empty($_SESSION['purchased'])) {
     error($ERROR_MISSING_PROOF);
 }
 if (!empty($_SESSION['registered'])) {
-    // already registered
-    error($ERROR_PROOF_ALREADY_USED);
+    // proof was already used to register an account
+    session_destroy();
+    header("location: $HASHCASH_BASE_URL/");
 }
 
 // Register Account
