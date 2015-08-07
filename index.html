@@ -51,24 +51,7 @@
     <div id="monitor" style="display:none;">
         <h3>Generating proof-of-work...</h3>
 
-        <div id="workers">
-            <div>
-                <span class="worker">Worker #1:</span>
-                <div id="progress0"></div>
-            </div>
-            <div>
-                <span class="worker">Worker #2:</span>
-                <div id="progress1"></div>
-            </div>
-            <div>
-                <span class="worker">Worker #3:</span>
-                <div id="progress2"></div>
-            </div>
-            <div>
-                <span class="worker">Worker #4:</span>
-                <div id="progress3"></div>
-            </div>
-        </div>
+        <div id="workers"></div>
     </div>
 
     <div id="registration" style="display:none;">
@@ -166,7 +149,7 @@
             var numRounds = parseInt(parts[2]);
             
             var workers = [];
-            var workerCount = 4;
+            var workerCount = navigator.hardwareConcurrency || 4; // not supported in firefox, fallback to 4 threads
             var workSize = 1000000;
             var perWorker = workSize / workerCount;
 
@@ -208,6 +191,22 @@
             // Create Workers
             for (var i = 0; i < workerCount; i++) {
                 console.log("Starting Worker #" + i);
+
+                // view
+                var view = document.createElement('div');
+
+                var title = document.createElement('span');
+                title.className = 'worker';
+                title.textContent = "Worker #" + i;
+                view.appendChild(title);
+
+                var progress = document.createElement('div');
+                progress.id = 'progress' + i;
+                view.appendChild(progress);
+
+                document.getElementById('workers').appendChild(view);
+
+                // worker
                 var worker = new Worker("js/hashcash.js");
                 worker.postMessage([salt, payload, perWorker * i, perWorker * (i + 1), numRounds]);
                 worker.onmessage = onMessageFunction("progress" + i.toString());
