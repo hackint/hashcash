@@ -44,7 +44,13 @@ $(function () {
 
     window.setInterval(function () {
         // keep session alive
-        jQuery.ajax({url: "/hashcash/keepalive.php", type: "GET"});
+        jQuery.ajax({
+            url: "/hashcash/backend.php",
+            type: 'GET',
+            data: {
+                'action': 'ping'
+            }
+        });
     }, 60000);
 
     $.ajax({

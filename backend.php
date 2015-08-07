@@ -19,6 +19,10 @@ if (!empty($_SESSION['purchased'])) {
 
 // Action Router
 switch ($_GET["action"]) {
+    case "ping":
+        ok('pong');
+        break;
+
     case "order":
         // Secret Initialization
         if (!empty($_SESSION['secret'])) {
