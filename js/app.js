@@ -1,0 +1,135 @@
+$(function () {
+    var error = function(errmsg) {
+        $('#errmsg').html(errmsg);
+        $('#error').show();
+    };
+
+    var accept = function (resp) {
+        var chunks = resp.split(":", 2);
+
+        if (chunks[0] == "error") {
+            error(chunks[1]);
+            return;
+        }
+        if (chunks[1] == "purchase ok") {
+            $('#txtAccountName').prop('disabled', false);
+            $('#txtPassword').prop('disabled', false);
+            $('#btnRegister').prop('disabled', false);
+            $("#registration").show();
+        }
+    };
+
+    // hashcash register form - submit action
+    $("#btnRegister").bind("click", function () {
+        $.ajax({
+            url: "/hashcash/register.php",
+            type: "POST",
+            data: {
+                username: $("#txtAccountName").val(),
+                password: $("#txtPassword").val()
+            }
+        }).done(function (resp) {
+            var chunks = resp.split(":");
+
+            if (chunks[0] == "error") {
+                error(chunks[1]);
+            } else if (chunks[0] == "ok") {
+                // alert(chunks[1]);
+                window.location = "http://www.hackint.org/ihashcashok.html";
+            } else {
+                error("Unexpected server response");
+            }
+        });
+    });
+
+    window.setInterval(function () {
+        // keep session alive
+        jQuery.ajax({url: "/hashcash/keepalive.php", type: "GET"});
+    }, 60000);
+
+    $.ajax({
+        url: "/hashcash/backend.php",
+        type: "GET",
+        data: {action: "order"}
+    }).done(function (resp) {
+        console.log(resp);
+        var chunks = resp.split(":", 2);
+
+        if (chunks[0] == "error") {
+            error(chunks[1]);
+            return;
+        }
+
+        var parts = chunks[1].split(";");
+        var salt = parts[0];
+        var payload = parts[1];
+        var numRounds = parseInt(parts[2]);
+
+        var workers = [];
+        var workerCount = navigator.hardwareConcurrency || 4; // not supported in firefox, fallback to 4 threads
+        var workSize = 1000000;
+        var perWorker = workSize / workerCount;
+
+        var onMessageFunction = function (pid) {
+            return function (resp) {
+                console.log("[#" + pid + "] " + resp.data['event'] + ": " + resp.data['text']);
+                if (resp.data["event"] == "finished") {
+                    var proof = resp.data["value"].toString();
+                    // insert proof
+                    $('#proof').val(proof);
+                    // hide worker monitor
+                    $('#monitor').hide();
+                    // enable form
+                    $('#txtAccountName').prop('disabled', false);
+                    $('#txtPassword').prop('disabled', false);
+                    $('#btnRegister').prop('disabled', false);
+                    $('#registration').show();
+                    jQuery.ajax({
+                        url: "/hashcash/backend.php",
+                        type: "GET",
+                        data: {
+                            action: "purchase",
+                            secret: proof
+                        }
+                    }).done(accept);
+
+                    // Terminate Workers
+                    for (var i = 0; i < workers.length; i++) {
+                        console.log("Terminating Worker #" + i);
+                        workers[i].terminate();
+                    }
+                } else if (resp.data["event"] == "progress") {
+                    // Update Worker Progress
+                    $('#' + pid).html(resp.data["text"]);
+                }
+            };
+        };
+
+        // Create Workers
+        for (var i = 0; i < workerCount; i++) {
+            console.log("Starting Worker #" + i);
+
+            // view
+            var view = document.createElement('div');
+
+            var title = document.createElement('span');
+            title.className = 'worker';
+            title.textContent = "Worker #" + i;
+            view.appendChild(title);
+
+            var progress = document.createElement('div');
+            progress.id = 'progress' + i;
+            view.appendChild(progress);
+
+            document.getElementById('workers').appendChild(view);
+
+            // worker
+            var worker = new Worker("js/hashcash.js");
+            worker.postMessage([salt, payload, perWorker * i, perWorker * (i + 1), numRounds]);
+            worker.onmessage = onMessageFunction("progress" + i.toString());
+            workers.push(worker);
+        }
+
+        $('#monitor').show();
+    });
+});
