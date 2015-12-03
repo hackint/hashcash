@@ -5,7 +5,7 @@ $RPC_PORT = 8080;
 
 $HASHCASH_BASE_URL = '/hashcash';
 
-$HASHCASH_DEFAULT_EMAIL = "some@anonymous-user.yeah";
+$HASHCASH_DEFAULT_EMAIL = "hashcash@anonymous.user";
 $HASHCASH_ROUNDS = 99;
 
 $ACCOUTNAME_MAX_LEN = 20;
@@ -22,7 +22,7 @@ $ERROR_PROOF_INCORRECT = "Proof was incorrect, <a href=\"reset.php\">try again</
 
 $ERROR_ACCOUNTNAME_MISSING = "Enter an accoutname.";
 $ERROR_ACCOUNTNAME_MAXLEN = "Your accoutname should not be longer than $ACCOUTNAME_MAX_LEN characters.";
-$ERROR_ACCOUNTNAME_CASE = "Your accountname has to be lowercase.";
+$ERROR_ACCOUNTNAME_CASE = "Your accountname has to be lowercase letters.";
 
 $ERROR_PASSWORD_MISSING = "Enter a password.";
 
