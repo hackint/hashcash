@@ -22,7 +22,7 @@ $(function () {
     // hashcash register form - submit action
     $("#btnRegister").bind("click", function () {
         $.ajax({
-            url: "/hashcash/register.php",
+            url: "register.php",
             type: "POST",
             data: {
                 username: $("#txtAccountName").val(),
@@ -45,7 +45,7 @@ $(function () {
     window.setInterval(function () {
         // keep session alive
         jQuery.ajax({
-            url: "/hashcash/backend.php",
+            url: "backend.php",
             type: 'GET',
             data: {
                 'action': 'ping'
@@ -54,7 +54,7 @@ $(function () {
     }, 60000);
 
     $.ajax({
-        url: "/hashcash/backend.php",
+        url: "backend.php",
         type: "GET",
         data: {action: "order"}
     }).done(function (resp) {
@@ -91,7 +91,7 @@ $(function () {
                     $('#btnRegister').prop('disabled', false);
                     $('#registration').show();
                     jQuery.ajax({
-                        url: "/hashcash/backend.php",
+                        url: "backend.php",
                         type: "GET",
                         data: {
                             action: "purchase",
