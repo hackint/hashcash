@@ -35,7 +35,7 @@ $(function () {
                 error(chunks[1]);
             } else if (chunks[0] == "ok") {
                 // alert(chunks[1]);
-                window.location = "http://www.hackint.org/ihashcashok.html";
+                window.location = "http://www.hackint.org/hashcash_finish";
             } else {
                 error("Unexpected server response");
             }
