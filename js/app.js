@@ -73,7 +73,7 @@ $(function () {
 
         var workers = [];
         var workerCount = navigator.hardwareConcurrency || 4; // not supported in firefox, fallback to 4 threads
-        var workSize = 1000000;
+        var workSize = 10**7;
         var perWorker = workSize / workerCount;
 
         var onMessageFunction = function (pid) {
