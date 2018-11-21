@@ -1,6 +1,6 @@
 <?php
 
-$RPC_HOST = "127.0.0.1";
+$RPC_HOST = "[::1]";
 $RPC_PORT = 8080;
 
 $HASHCASH_BASE_URL = '/hashcash';
