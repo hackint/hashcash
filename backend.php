@@ -30,7 +30,7 @@ switch ($_GET["action"]) {
         }
 
         $salt = hash("sha1", openssl_random_pseudo_bytes(1024));
-        $secret = rand(1, 10**7/2); // workSize
+        $secret = rand(1, $HASHCASH_RAND_MAX); // workSize
         $uuaa = "$salt$secret";
         for ($i = 0; $i < $HASHCASH_ROUNDS; $i++) {
             $uuaa = hash("sha256", $uuaa);

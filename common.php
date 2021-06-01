@@ -6,7 +6,8 @@ $RPC_PORT = 8080;
 $HASHCASH_BASE_URL = '/hashcash';
 
 $HASHCASH_DEFAULT_EMAIL = "hashcash@anonymous.user";
-$HASHCASH_ROUNDS = 99;
+$HASHCASH_RAND_MAX = (10 ** 7) / 2;
+$HASHCASH_ROUNDS = 400;
 
 $ACCOUTNAME_MAX_LEN = 20;
 

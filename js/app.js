@@ -35,7 +35,7 @@ $(function () {
                 error(chunks[1]);
             } else if (chunks[0] == "ok") {
                 // alert(chunks[1]);
-                window.location = "http://www.hackint.org/transport/tor";
+                window.location = "https://www.hackint.org/transport/tor";
             } else {
                 error("Unexpected server response");
             }
@@ -73,7 +73,7 @@ $(function () {
 
         var workers = [];
         var workerCount = navigator.hardwareConcurrency || 4; // not supported in firefox, fallback to 4 threads
-        var workSize = 10**7/2;
+        var workSize = 10**7/2;  // keep in sync with common.php
         var perWorker = workSize / workerCount;
 
         var onMessageFunction = function (pid) {

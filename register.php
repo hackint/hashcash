@@ -51,7 +51,7 @@ if (strpos($resp, 'Registration successful') !== FALSE) {
     // Destroy session to prevent proof reusal
     session_destroy();
 
-    ok("Registration successful:http://www.hackint.org/");
+    ok("Registration successful:https://www.hackint.org/");
 } else {
     error($resp);
 }
